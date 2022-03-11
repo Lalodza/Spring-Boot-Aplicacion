@@ -68,12 +68,12 @@ public class User implements Serializable{
 		this.id = id;
 	}
 
-	public String getFirtName() {
+	public String getFirstName() {
 		return firstName;
 	}
 
-	public void setFirtName(String firtName) {
-		this.firstName = firtName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getLastName() {
@@ -126,7 +126,7 @@ public class User implements Serializable{
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", firtName=" + firstName + ", lastName=" + lastName + ", email=" + email
+		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", username=" + username + ", password=" + password + ", confirmPassword=" + confirmPassword
 				+ ", roles=" + roles + "]";
 	}
