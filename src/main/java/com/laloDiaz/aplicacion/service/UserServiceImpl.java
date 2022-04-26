@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.laloDiaz.aplicacion.dto.ChangePasswordForm;
 import com.laloDiaz.aplicacion.entity.User;
 import com.laloDiaz.aplicacion.repository.UserRepository;
 
@@ -70,6 +71,24 @@ public class UserServiceImpl implements UserService{
 	public void deleteUser(Long id) throws Exception {
 		User user = getUserById(id);
 		repository.delete(user);
+	}
+
+	@Override
+	public User changePassword(ChangePasswordForm form) throws Exception {
+		User user = getUserById(form.getId());
+		
+		if(!user.getPassword().equals(form.getCurrentPassword())) {
+			throw new Exception("Current Password Invalido.");
+		}
+		if(user.getPassword().equals(form.getNewPassword())) {
+			throw new Exception("Debe ser diferente al Password Actual.");
+		}
+		if(!form.getNewPassword().equals(form.getConfirmPassword())) {
+			throw new Exception("Confirmar Password no es igual a Nueva Password");
+		}
+		
+		user.setPassword(form.getNewPassword());
+		return repository.save(user);
 	}
 
 
