@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService{
 		User toUser = getUserById(fromUser.getId());
 		mapUser(fromUser, toUser);
 		return repository.save(toUser);
-	}
+	}	
 	
 	protected void mapUser(User from,User to) {
 		to.setUsername(from.getUsername());
