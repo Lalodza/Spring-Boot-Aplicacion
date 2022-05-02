@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.laloDiaz.aplicacion.Exception.CustomeFieldValidationException;
 import com.laloDiaz.aplicacion.Exception.UsernameOrIdNotFound;
 import com.laloDiaz.aplicacion.dto.ChangePasswordForm;
 import com.laloDiaz.aplicacion.entity.User;
@@ -31,17 +32,17 @@ public class UserServiceImpl implements UserService{
 	private boolean checkUsernameAvailable(User user) throws Exception {
 		Optional<User> userFound = repository.findByUsername(user.getUsername());
 		if (userFound.isPresent()) {
-			throw new Exception("Username no disponible");
+			throw new CustomeFieldValidationException("Username no disponible","username");
 		}
 		return true;
 	}
 	
 	private boolean checkPasswordValid(User user) throws Exception {
 		if (user.getConfirmPassword() == null || user.getConfirmPassword().isEmpty()) {
-			throw new Exception("Confirm Password es obligatorio");
+			throw new CustomeFieldValidationException("Confirm Password es obligatorio","confirmPassword");
 		}
 		if ( !user.getPassword().equals(user.getConfirmPassword())) {
-			throw new Exception("Password y confirmPassword no son iguales");
+			throw new CustomeFieldValidationException("Password y confirmPassword no son iguales","password");
 		}
 		return true;
 	}

@@ -1,5 +1,7 @@
 package com.laloDiaz.aplicacion.controller;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -17,8 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.laloDiaz.aplicacion.Exception.CustomeFieldValidationException;
 import com.laloDiaz.aplicacion.Exception.UsernameOrIdNotFound;
 import com.laloDiaz.aplicacion.dto.ChangePasswordForm;
+import com.laloDiaz.aplicacion.entity.Role;
 import com.laloDiaz.aplicacion.entity.User;
 import com.laloDiaz.aplicacion.repository.RoleRepository;
 import com.laloDiaz.aplicacion.service.UserService;
@@ -34,6 +38,45 @@ public class UserController {
 	
 	@GetMapping({"/","/login"})
 	public String index() {
+		return "index";
+	}
+	
+	@GetMapping("/signup")
+	public String signup(Model model) {
+		Role userRole = roleRepository.findByName("USER");
+		List<Role> roles = Arrays.asList(userRole);
+		model.addAttribute("userForm", new User());
+		model.addAttribute("roles",roles);
+		model.addAttribute("signup",true);
+		
+		return "user-form/user-signup";
+	}
+	
+	@PostMapping("/signup")
+	public String postSignup(@Valid @ModelAttribute("userForm")User user,BindingResult result, ModelMap model) {
+		Role userRole = roleRepository.findByName("USER");
+		List<Role> roles = Arrays.asList(userRole);
+		model.addAttribute("userForm", user);
+		model.addAttribute("roles",roles);
+		model.addAttribute("signup",true);
+		
+		if (result.hasErrors()) {
+			return "user-form/user-signup";
+		} else {
+			try {
+				userService.createUser(user);
+			} catch (CustomeFieldValidationException cfve) {
+				result.rejectValue(cfve.getFieldName(), null, cfve.getMessage());
+				return "user-form/user-signup";
+
+			}
+			
+			catch (Exception e) {
+				model.addAttribute("formErrorMessage",e.getMessage());
+				return "user-form/user-signup";
+
+			}
+		}
 		return "index";
 	}
 	
@@ -56,7 +99,15 @@ public class UserController {
 				userService.createUser(user);
 				model.addAttribute("userForm",new User());
 				model.addAttribute("listTab","active");
-			} catch (Exception e) {
+			} catch (CustomeFieldValidationException cfve) {
+				result.rejectValue(cfve.getFieldName(), null, cfve.getMessage());
+				model.addAttribute("userForm", user);
+				model.addAttribute("formTab","active");
+				model.addAttribute("userList",userService.getAllUsers());
+				model.addAttribute("roles",roleRepository.findAll());
+			}
+			
+			catch (Exception e) {
 				model.addAttribute("formErrorMessage",e.getMessage());
 				model.addAttribute("userForm", user);
 				model.addAttribute("formTab","active");
